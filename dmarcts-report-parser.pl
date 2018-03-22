@@ -116,7 +116,7 @@ sub show_usage {
 # Define all possible configuration options.
 our ($debug, $delete_reports, $delete_failed, $reports_replace, $maxsize_xml, $compress_xml,
 	$dbname, $dbuser, $dbpass, $dbhost,
-	$imapserver, $imapuser, $imappass, $imapignoreerror, $imapssl, $imaptls, $imapmovefolder, $imapreadfolder, $imapopt, $tlsverify);
+	$imapserver, $imapuser, $imappass, $imapport, $authmech, $imapignoreerror, $imapssl, $imaptls, $imapmovefolder, $imapreadfolder, $imapopt, $tlsverify);
 
 # defaults
 $maxsize_xml 	= 50000;
@@ -231,12 +231,16 @@ if ($reports_source == TS_IMAP) {
 	print "connection to $imapserver with Ssl => $imapssl, User => $imapuser, Ignoresizeerrors => $imapignoreerror\n" if $debug;
 
 	# Setup connection to IMAP server.
-	my $imap = Mail::IMAPClient->new( Server => $imapserver,
-		Ssl => $imapssl,
-		Starttls => $imapopt,
-		User => $imapuser,
-		Password => $imappass,
+	my $imap = Mail::IMAPClient->new(
+        Server => $imapserver,
+        Port => $imapport,
+        User => $imapuser,
+        Password => $imappass,
+        Ssl => $imapssl,
+        # Starttls => $imapopt, # cause error : BAD TLS is already active
+        Authmechanism => $authmech,
 		Ignoresizeerrors => $imapignoreerror,
+        Uid => 1,
 		Debug=> $debug
   )
 	# module uses eval, so we use $@ instead of $!
